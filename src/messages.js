@@ -11,7 +11,15 @@ export const TREND_NAMES = {
   en: { rising: 'Rising', falling: 'Falling', slack: 'Slack water' },
   fr: { rising: 'Monte', falling: 'Descend', slack: 'Étale' },
   de: { rising: 'Steigt', falling: 'Fällt', slack: 'Stauwasser' },
-  es: { rising: 'Sube', falling: 'Baja', slack: 'Repunte' },
+  es: { rising: 'Sube', falling: 'Baja', slack: 'Estoa' },
+};
+
+// Trend of a silent gauge.
+export const TREND_UNKNOWN = {
+  en: 'Unknown',
+  fr: 'Inconnue',
+  de: 'Unbekannt',
+  es: 'Desconocida',
 };
 
 // Values of the "Last reading" feature.

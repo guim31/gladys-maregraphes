@@ -31,7 +31,15 @@ import { createLogger } from '@gladysassistant/integration-sdk';
 import { HOME_STATIONS, MAX_STATIONS, normalizeName } from './config.js';
 import { buildDevice, stationIds, stationIdOf } from './devices.js';
 import { distanceKm } from './geo.js';
-import { READINGS, STATUS, TREND_NAMES, formatDate, join, render } from './messages.js';
+import {
+  READINGS,
+  STATUS,
+  TREND_NAMES,
+  TREND_UNKNOWN,
+  formatDate,
+  join,
+  render,
+} from './messages.js';
 import { Shom } from './shom.js';
 
 const logger = createLogger({ name: 'maregraphes' });
@@ -75,7 +83,9 @@ export const DEFAULT_TIMINGS = {
   // The gauge list (names, positions) is downloaded again after a week.
   referentialMaxAgeMs: 7 * DAY,
   // A failed download of the gauge list is tried again after this delay.
-  referentialRetryMs: HOUR,
+  referentialRetryMs: 10 * MINUTE,
+  // No gauge around the house sent a reading: chosen again after this delay.
+  homeRetryMs: 30 * MINUTE,
   // The gauge around the house is chosen again once a day.
   homeMaxAgeMs: DAY,
   // A threshold side remembered for longer fires no trigger when it changes (restart).
@@ -222,6 +232,8 @@ export class Monitor {
     this.config = config;
     this.data.home = null;
     this.resolved = false;
+    // A new configuration deserves a new try at the gauge list.
+    this.referentialFailedAt = -Infinity;
     // A cycle already running reads the old configuration: run another one after it.
     await this.runCycle({ again: true });
     await this.publishDiscovered();
@@ -302,6 +314,12 @@ export class Monitor {
       longitude: null,
       surge: (device.features ?? []).some((f) => f.external_id.endsWith(':surge')),
     };
+  }
+
+  /** Whether the device of a gauge in Gladys has the surge features. */
+  hasSurgeFeatures(id) {
+    const surgeId = stationIds(this.gladys, id).surge;
+    return Boolean(this.deviceOf(id)?.features?.some((f) => f.external_id === surgeId));
   }
 
   /** The name shown for a gauge: the one given in Gladys, else the SHOM one. */
@@ -400,6 +418,14 @@ export class Monitor {
     for (const name of problems.unknown) {
       this.failed(`unknown:${name}`, 'warn', `Unknown tide gauge: ${name}`);
     }
+    if (complete) {
+      // A name fixed in the configuration: logged again if it comes back mistyped.
+      for (const key of [...this.failing].filter((k) => k.startsWith('unknown:'))) {
+        if (!problems.unknown.includes(key.slice('unknown:'.length))) {
+          this.failing.delete(key);
+        }
+      }
+    }
   }
 
   /**
@@ -444,11 +470,9 @@ export class Monitor {
   async homeStations(stations) {
     const radius = this.config.homeRadiusKm;
     const cached = this.data.home;
-    if (
-      cached &&
-      cached.radiusKm === radius &&
-      this.now() - cached.at < this.timings.homeMaxAgeMs
-    ) {
+    // An empty choice (no nearby gauge sending) is made again sooner.
+    const maxAge = cached?.ids.length > 0 ? this.timings.homeMaxAgeMs : this.timings.homeRetryMs;
+    if (cached && cached.radiusKm === radius && this.now() - cached.at < maxAge) {
       return cached.ids;
     }
     const house = await this.house({ strict: true });
@@ -747,6 +771,9 @@ export class Monitor {
     const events = [];
     const track = (group, measure, thresholds, hysteresis, onRise, onFall) => {
       if (measure === null) {
+        // No value any more (the forecast stopped, the gauge went silent):
+        // forget the sides, so its return is not taken for a crossing.
+        delete memory[group];
         return;
       }
       const sides = (memory[group] ??= {});
@@ -835,6 +862,9 @@ export class Monitor {
       }
       const featureIds = stationIds(this.gladys, id);
       const value = this.current(id);
+      // The features of the device in Gladys, not of the discovery: a device
+      // created before the forecast was known has no surge feature yet.
+      const surgeFeatures = this.hasSurgeFeatures(id);
       const push = (key, state) =>
         states.push({ device_feature_external_id: featureIds[key], state });
       const text = (key, content) =>
@@ -844,11 +874,14 @@ export class Monitor {
       }
       if (value.trend) {
         text('trend', TREND_NAMES[language][value.trend]);
+      } else if (!value.fresh && value.lastReadingAt !== null) {
+        // A silent gauge has no trend: never leave an old "Rising" beside it.
+        text('trend', TREND_UNKNOWN[language]);
       }
-      if (station.surge && value.surge !== null) {
+      if (surgeFeatures && value.surge !== null) {
         push('surge', value.surge);
       }
-      if (station.surge && value.peak) {
+      if (surgeFeatures && value.peak) {
         push('surge_peak', value.peak.cm);
       }
       if (value.lastReadingAt !== null) {
@@ -895,11 +928,10 @@ export class Monitor {
 
   /** What the widget and the scene action show of one gauge. */
   view(id) {
-    const station = this.station(id);
     return {
       id,
       name: this.displayName(id),
-      surgeForecast: Boolean(station?.surge),
+      surgeForecast: this.hasSurgeFeatures(id),
       ...this.current(id),
     };
   }
@@ -909,7 +941,7 @@ export class Monitor {
     const since = this.now() - this.timings.historyMs;
     const heights = (this.data.readings[id]?.heights ?? []).filter((point) => point.t >= since);
     return heights.filter(
-      (point, index) => point.t % CHART_STEP_MS === 0 || index === heights.length - 1,
+      (point, index) => firstOfStep(heights, index) || index === heights.length - 1,
     );
   }
 
@@ -940,8 +972,17 @@ function thin(heights, now, keepMs) {
     (point, index) =>
       index === heights.length - 1 ||
       (now - point.t <= keepMs &&
-        (now - point.t <= FULL_RESOLUTION_MS || point.t % CHART_STEP_MS === 0)),
+        (now - point.t <= FULL_RESOLUTION_MS || firstOfStep(heights, index))),
   );
+}
+
+/**
+ * Whether a sea level is the first of its 10-minute step: gauges do not all
+ * report on round minutes (some every 2, 5 or 6 minutes, at odd offsets).
+ */
+function firstOfStep(heights, index) {
+  const step = Math.floor(heights[index].t / CHART_STEP_MS);
+  return index === 0 || Math.floor(heights[index - 1].t / CHART_STEP_MS) !== step;
 }
 
 function emptyData() {

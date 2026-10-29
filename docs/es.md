@@ -17,7 +17,7 @@ Para las **predicciones de marea** (pleamares, bajamares, coeficientes), vea la 
 ## Lo que obtiene
 
 - **Un dispositivo por mareógrafo** seguido: el **nivel del mar medido** (en m), la **tendencia**
-  de la marea (sube, baja, repunte), la **sobreelevación prevista** ahora y la **sobreelevación
+  de la marea (sube, baja, estoa), la **sobreelevación prevista** ahora y la **sobreelevación
   máxima prevista para las próximas 24 horas** (en cm), y la hora de la última medición.
 - Un mareógrafo que deja de enviar durante más de una hora se muestra como tal («Sin nueva
   medición desde…»): un valor antiguo nunca se reenvía como si fuera reciente, y ningún valor se
@@ -75,13 +75,12 @@ reciente». Copie los números en «Mareógrafos» y guarde.
 | Función                        | Tipo en Gladys   | Valor                                                                                                     |
 | ------------------------------ | ---------------- | --------------------------------------------------------------------------------------------------------- |
 | Nivel del mar medido           | Profundidad (m)  | La última medición del mareógrafo, al centímetro, tal como la difunde el SHOM.                            |
-| Tendencia de la marea          | Texto            | Sube, Baja o Repunte, según los últimos 15 a 20 minutos de mediciones.                                    |
+| Tendencia de la marea          | Texto            | Sube, Baja o Estoa, según los últimos 15 a 20 minutos de mediciones.                                      |
 | Sobreelevación prevista (SHOM) | Profundidad (cm) | La sobreelevación que el SHOM prevé ahora: positiva por encima de la marea predicha, negativa por debajo. |
 | Sobreelevación máx. en 24 h    | Profundidad (cm) | La mayor sobreelevación prevista entre ahora y dentro de 24 horas.                                        |
 | Última medición                | Texto            | Hora de la última medición, o «Sin nueva medición desde…».                                                |
 
-Las dos funciones de sobreelevación solo existen si el SHOM prevé la sobreelevación del
-mareógrafo. El **nivel del mar no es una profundidad**: es la altura del agua sobre la referencia
+Las dos funciones de sobreelevación solo existen si el SHOM prevé la sobreelevación del mareógrafo (si la previsión aparece después de crear el dispositivo, actualícelo en la pestaña Descubrir). Un mareógrafo sin datos muestra «Desconocida» como tendencia. El **nivel del mar no es una profundidad**: es la altura del agua sobre la referencia
 del mareógrafo (en general el cero hidrográfico, el de las tablas de mareas); se compara con las
 alturas de la tabla del mismo puerto, no con otro mareógrafo. Los parámetros del dispositivo
 contienen el número SHOM y la red (REFMAR, RONIM).
@@ -112,8 +111,7 @@ Añada el widget **Mareógrafos** a un panel.
 
 Un valor debe bajar 5 cm por debajo de un umbral antes de que un nuevo cruce cuente: una
 sobreelevación o un nivel que oscila alrededor de un umbral dispara una sola vez. Los
-disparadores solo se activan para un dispositivo creado, con datos recientes, y no tras un
-reinicio de más de 3 horas.
+disparadores solo se activan para un dispositivo creado (los de sobreelevación siguen la previsión del SHOM, aunque el nivel ya no llegue), y no tras un reinicio de más de 3 horas.
 
 ## Acción de escena
 

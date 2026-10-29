@@ -266,3 +266,85 @@ test('the container refreshes on its own timer, without onPoll', async (t) => {
   assert.ok(world.api.requests.length > before, 'a cycle ran');
   assert.equal(poll.mock.callCount(), 0);
 });
+
+// --- Review of 29/10 ------------------------------------------------------------
+
+test('a device created before the forecast was known gets no surge state', async (t) => {
+  const api = createApi();
+  api.setSurges(BREST, 0, 0, () => 0);
+  const world = await createWorld({ config: { stations: BREST }, api });
+  t.after(() => world.app.stop());
+  const device = await create(world, BREST);
+  assert.equal(featureId(device, 'surge'), undefined);
+  const now = world.clock.now();
+  api.setSurges(BREST, now - HOUR, now + 26 * HOUR, () => 0.1);
+  await cycle(world, 10);
+  assert.equal(discovered(world, BREST).features.length, 5, 'offered as an update');
+  assert.ok(!world.fake.states.some((s) => s.device_feature_external_id.endsWith(':surge')));
+  assert.equal(world.monitor.view(BREST).surgeForecast, false);
+});
+
+test('a silent gauge shows an unknown trend, not the last one', async (t) => {
+  const { world, devices } = await followed(t, [BREST]);
+  for (let i = 0; i < 7; i += 1) {
+    await cycle(world, 10);
+  }
+  assert.equal(last(world, featureId(devices[0], 'trend')), 'Inconnue');
+});
+
+test('no gauge sending around the house: chosen again after 30 minutes, not a day', async (t) => {
+  const api = createApi();
+  const brest = api.series[BREST];
+  api.series[BREST] = [];
+  const world = await createWorld({ config: { around_home: '25' }, api });
+  t.after(() => world.app.stop());
+  assert.deepEqual(world.monitor.followed(), []);
+  api.series[BREST] = brest;
+  api.fillHeights(BREST, START, START + 40 * MINUTE, () => 5);
+  for (let i = 0; i < 4; i += 1) {
+    await cycle(world, 10);
+  }
+  assert.deepEqual(world.monitor.followed(), [BREST]);
+});
+
+test('the gauge list is asked again 10 minutes after a failure', async (t) => {
+  const api = createApi();
+  api.down = 503;
+  const world = await createWorld({ config: { stations: BREST }, api });
+  t.after(() => world.app.stop());
+  assert.deepEqual(world.monitor.followed(), []);
+  api.down = false;
+  await cycle(world, 10);
+  assert.deepEqual(world.monitor.followed(), [BREST]);
+});
+
+test('gauges reporting at odd minutes keep one point per 10 minutes for the chart', async (t) => {
+  const { world } = await followed(t, [BREST]);
+  const from = START + 3 * MINUTE;
+  for (let time = from; time <= START + 6 * HOUR; time += 6 * MINUTE) {
+    world.api.addHeight(BREST, time, 4);
+  }
+  for (let i = 0; i < 36; i += 1) {
+    await cycle(world, 10);
+  }
+  const points = world.monitor.chartPoints(BREST);
+  assert.ok(points.length >= 30, `${points.length} chart points`);
+});
+
+test('a forecast that stops forgets the surge sides: its return fires nothing', async (t) => {
+  const { world } = await followed(t, [BREST]);
+  let now = world.clock.now();
+  // The last forecast received runs out 20 minutes later.
+  world.api.setSurges(BREST, now - HOUR, now + 20 * MINUTE, () => 0.6);
+  await cycle(world, 10);
+  const fired = world.fake.sceneEvents.length;
+  world.api.setSurges(BREST, 0, 0, () => 0);
+  for (let i = 0; i < 5; i += 1) {
+    await cycle(world, 10);
+  }
+  assert.equal(world.monitor.view(BREST).surge, null);
+  now = world.clock.now();
+  world.api.setSurges(BREST, now - HOUR, now + 26 * HOUR, () => 0.6);
+  await cycle(world, 10);
+  assert.equal(world.fake.sceneEvents.length, fired);
+});

@@ -14,8 +14,9 @@
 //                                                              SHOM, every 10 minutes,
 //                                                              in m, up to ~3 days ahead.
 //
-// Times are UTC, written "2026/10/29 12:00:00". An unknown source answers 400;
-// an unknown gauge an empty list. The tide prediction (source 7) and the
+// Times are UTC, written "2026/10/29 12:00:00". An unknown source answers 400,
+// an unknown gauge 403 (ids only come from the list), a gauge without data an
+// empty list. The tide prediction (source 7) and the
 // measured surge (source 8) are not served by this keyless service: the
 // integration publishes the forecast surge of the SHOM as it is, and never
 // invents a measured surge.

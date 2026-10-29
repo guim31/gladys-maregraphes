@@ -81,7 +81,7 @@ Chaque ligne donne le numéro, le nom, la distance à votre maison et la hauteur
 | Surcote max. sur 24 h | Profondeur (cm)  | La plus forte surcote prévue entre maintenant et dans 24 heures.                                                  |
 | Dernière mesure       | Texte            | Heure de la dernière mesure, ou « Pas de nouvelle mesure depuis… ».                                               |
 
-Les deux fonctionnalités de surcote n'existent que si le SHOM prévoit la surcote du marégraphe.
+Les deux fonctionnalités de surcote n'existent que si le SHOM prévoit la surcote du marégraphe (si la prévision apparaît après la création de l'appareil, « Mettez à jour » celui-ci dans l'onglet Découverte). Un marégraphe muet affiche « Inconnue » en tendance.
 La **hauteur d'eau n'est pas une profondeur** : c'est la hauteur de l'eau au-dessus de la
 référence du marégraphe (en général le zéro hydrographique, celui des annuaires de marée) ; elle
 se compare aux hauteurs de l'annuaire du même port, pas à un autre marégraphe. Les paramètres de
@@ -112,9 +112,7 @@ Ajoutez le widget **Marégraphes** à un tableau de bord.
 | Hauteur d'eau au-dessus d'un seuil         | Marégraphe, hauteur (0,5 à 12 m) | Nom du marégraphe, seuil, hauteur (m)                        |
 
 Une valeur doit redescendre de 5 cm sous un seuil avant qu'un nouveau franchissement compte : une
-surcote ou une hauteur qui oscille autour d'un seuil ne déclenche qu'une fois. Les déclencheurs
-ne partent que pour un appareil créé, sur des données fraîches, et pas après un redémarrage de
-plus de 3 heures.
+surcote ou une hauteur qui oscille autour d'un seuil ne déclenche qu'une fois. Les déclencheurs ne partent que pour un appareil créé (ceux de surcote suivent la prévision du SHOM, même si le marégraphe ne mesure plus), et pas après un redémarrage de plus de 3 heures.
 
 ## Action de scène
 

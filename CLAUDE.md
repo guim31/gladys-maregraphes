@@ -261,7 +261,9 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
   `service/tidegauges` (176 marégraphes le 29/10/2026, `shom_id`, `name` en majuscules avec `_`,
   `state` OK/ASYNC/OLD/KO/PB/HIDDEN, `reseau` REFMAR/RONIM ; les `HIDDEN` sont écartés). Mesures :
   `observation/json/<id>?sources=1,9&dtStart=…Z&dtEnd=…Z`, horodatage UTC « 2026/10/29 12:00:00 ».
-  Un identifiant inconnu rend une liste vide ; une source inconnue, 400.
+  Un identifiant inconnu rend **403** (vérifié le 29/10 ; les identifiants ne viennent que de la
+  liste) ; une source inconnue, 400 ; un marégraphe sans données, une liste vide. Papeete (383)
+  n'a pas de prévision de surcote.
 - Sources vérifiées dans le front de data.shom.fr : 1 brutes haute fréquence (chaque minute, m),
   2 brutes temps différé, 3 validées temps différé, 4 validées horaires, 5 brutes horaires, 6
   pleines et basses mers, **7 prédictions de marée et 8 surcotes mesurées : refusées (400) par le

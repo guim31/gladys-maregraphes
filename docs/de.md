@@ -79,7 +79,7 @@ Wasserstand oder „keine aktuelle Messung“. Kopiere die Nummern in „Pegel�
 | Höchster Windstau in 24 h  | Flüssigkeitstiefe (cm) | Der höchste vorhergesagte Windstau zwischen jetzt und in 24 Stunden.                                     |
 | Letzte Messung             | Text                   | Uhrzeit der letzten Messung oder „Keine neue Messung seit…“.                                             |
 
-Die beiden Windstau-Funktionen gibt es nur, wenn der SHOM den Windstau des Pegels vorhersagt. Der
+Die beiden Windstau-Funktionen gibt es nur, wenn der SHOM den Windstau des Pegels vorhersagt (erscheint die Vorhersage erst nach dem Anlegen des Geräts, aktualisiere es im Tab „Entdecken“). Ein stiller Pegel zeigt „Unbekannt“ als Tendenz. Der
 **Wasserstand ist keine Tiefe**: Es ist die Höhe des Wassers über dem Bezugsniveau des Pegels
 (meist das Seekartennull, die Null der Gezeitentafeln); er lässt sich mit den Höhen der
 Gezeitentafel desselben Hafens vergleichen, nicht mit einem anderen Pegel. Die Geräteparameter
@@ -110,8 +110,7 @@ Füge das Widget **Pegel** einem Dashboard hinzu.
 | Wasserstand über einer Schwelle         | Pegel, Höhe (0,5 bis 12 m)      | Name des Pegels, Schwelle, Wasserstand (m)                      |
 
 Ein Wert muss 5 cm unter eine Schwelle zurückgehen, bevor ein neues Überschreiten zählt: Ein
-Windstau oder Wasserstand, der um eine Schwelle pendelt, löst einmal aus. Auslöser feuern nur für
-ein angelegtes Gerät, mit frischen Daten, und nicht nach einem Neustart von mehr als 3 Stunden.
+Windstau oder Wasserstand, der um eine Schwelle pendelt, löst einmal aus. Auslöser feuern nur für ein angelegtes Gerät (die Windstau-Auslöser folgen der Vorhersage des SHOM, auch wenn der Pegel nicht mehr misst), und nicht nach einem Neustart von mehr als 3 Stunden.
 
 ## Szenenaktion
 

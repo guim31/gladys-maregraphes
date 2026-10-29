@@ -6,7 +6,7 @@
     "en": "Measured sea level and surge forecast of the SHOM tide gauges (REFMAR), France and overseas.",
     "fr": "Hauteur d'eau mesurée et surcote prévue aux marégraphes du SHOM (REFMAR), métropole et outre-mer.",
     "de": "Gemessener Wasserstand und Windstau-Vorhersage der SHOM-Pegel (REFMAR), Frankreich und Übersee.",
-    "es": "Nivel del mar medido y sobreelevación prevista de los mareógrafos del SHOM (REFMAR), Francia."
+    "es": "Nivel del mar medido y sobreelevación prevista en los mareógrafos del SHOM, Francia y ultramar."
   },
   "version": "1.0.0",
   "docker_image": "ghcr.io/guim31/gladys-maregraphes:1.0.0",

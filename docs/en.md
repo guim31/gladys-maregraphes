@@ -78,7 +78,7 @@ Each line gives the number, the name, the distance from your house and the curre
 | Highest surge in 24 h | Liquid depth (cm) | The highest surge forecast between now and 24 hours from now.                            |
 | Last reading          | Text              | Time of the last reading, or "No new reading since…".                                    |
 
-The two surge features only exist when the SHOM forecasts the surge of the gauge. The **sea level
+The two surge features only exist when the SHOM forecasts the surge of the gauge (if the forecast appears after you created the device, "Update" it in the Discover tab). A silent gauge shows "Unknown" as trend. The **sea level
 is not a depth**: it is the height of the water above the reference of the gauge (in general the
 chart datum, the zero of the tide tables), so it compares with the heights of the tide tables of
 the same harbour, not with another gauge. The device parameters hold the SHOM number and the
@@ -108,8 +108,7 @@ Add the **Tide gauges** widget to a dashboard.
 | Sea level above a threshold         | Tide gauge, height (0.5 to 12 m)     | Gauge name, threshold, sea level (m)                 |
 
 A value must go 5 cm back below a threshold before crossing it again counts: a surge or a level
-wobbling around a threshold fires once. Triggers only fire for a device you created, on fresh
-data, and not after a restart longer than 3 hours.
+wobbling around a threshold fires once. Triggers only fire for a device you created (the surge triggers follow the SHOM forecast, even when the gauge stops measuring), and not after a restart longer than 3 hours.
 
 ## Scene action
 

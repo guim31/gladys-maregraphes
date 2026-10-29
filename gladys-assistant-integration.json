@@ -1,177 +1,1036 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Marégraphes (SHOM)",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Measured sea level and surge forecast of the SHOM tide gauges (REFMAR), France and overseas.",
+    "fr": "Hauteur d'eau mesurée et surcote prévue aux marégraphes du SHOM (REFMAR), métropole et outre-mer.",
+    "de": "Gemessener Wasserstand und Windstau-Vorhersage der SHOM-Pegel (REFMAR), Frankreich und Übersee.",
+    "es": "Nivel del mar medido y sobreelevación prevista en los mareógrafos del SHOM, Francia y ultramar."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
-  "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "docker_image": "ghcr.io/guim31/gladys-maregraphes:1.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-maregraphes/main/cover.png",
+  "categories": ["environment"],
+  "countries": ["FR"],
+  "transports": ["cloud"],
+  "location": true,
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Your tide gauges",
+        "fr": "Vos marégraphes",
+        "de": "Deine Pegel",
+        "es": "Sus mareógrafos"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Follow the tide gauges of the SHOM (REFMAR network) on the coasts of France and overseas: by number or name, or the nearest one to your house. \"Find tide gauges\" below lists them with their current sea level. Save, then create the devices in the Discover tab.",
+        "fr": "Suivez les marégraphes du SHOM (réseau REFMAR) sur les côtes de métropole et d'outre-mer : par numéro ou par nom, ou le plus proche de votre maison. « Chercher des marégraphes » ci-dessous les liste avec leur hauteur d'eau actuelle. Enregistrez, puis créez les appareils dans l'onglet Découverte.",
+        "de": "Verfolge die Pegel des SHOM (Netz REFMAR) an den Küsten Frankreichs und der Überseegebiete: per Nummer oder Name, oder den nächsten zu deinem Haus. „Pegel suchen“ unten listet sie mit ihrem aktuellen Wasserstand auf. Speichere und lege dann die Geräte im Tab „Entdecken“ an.",
+        "es": "Siga los mareógrafos del SHOM (red REFMAR) en las costas de Francia y de ultramar: por número o nombre, o el más cercano a su casa. «Buscar mareógrafos» más abajo los enumera con su nivel actual. Guarde y cree los dispositivos en la pestaña Descubrir."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/guim31/gladys-maregraphes/blob/main/docs/en.md",
+          "label": {
+            "en": "Setup guide",
+            "fr": "Guide d'installation",
+            "de": "Installationsanleitung",
+            "es": "Guía de instalación"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "about",
+      "type": "section",
+      "label": {
+        "en": "Sources and limits",
+        "fr": "Sources et limites",
+        "de": "Quellen und Grenzen",
+        "es": "Fuentes y límites"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
       "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+        "en": "Data: SHOM, REFMAR network, and the organisations that run the gauges, read without an account. Raw real-time sea levels, not validated by the SHOM; the surge is the SHOM forecast. Not a warning service: the official warnings (Météo-France vigilance) prevail. Not affiliated with the SHOM.",
+        "fr": "Données : SHOM, réseau REFMAR, et les organismes qui exploitent les marégraphes, lues sans compte. Hauteurs brutes en temps réel, non validées par le SHOM ; la surcote est la prévision du SHOM. Pas un service d'alerte : la vigilance officielle (Météo-France) prime. Non affiliée au SHOM.",
+        "de": "Daten: SHOM, Netz REFMAR, und die Betreiber der Pegel, ohne Konto gelesen. Rohe Echtzeit-Wasserstände, vom SHOM nicht validiert; der Windstau ist die Vorhersage des SHOM. Kein Warndienst: Die amtlichen Warnungen (Météo-France) haben Vorrang. Nicht mit dem SHOM verbunden.",
+        "es": "Datos: SHOM, red REFMAR, y los organismos que operan los mareógrafos, leídos sin cuenta. Niveles brutos en tiempo real, no validados por el SHOM; la sobreelevación es la previsión del SHOM. No es un servicio de alerta: prevalecen los avisos oficiales (Météo-France). Sin afiliación con el SHOM."
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
-      "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
-      "required": false,
-      "default": "celsius",
-      "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+      "links": [
+        {
+          "url": "https://data.shom.fr/donnees/refmar",
+          "label": {
+            "en": "REFMAR on data.shom.fr",
+            "fr": "REFMAR sur data.shom.fr",
+            "de": "REFMAR auf data.shom.fr",
+            "es": "REFMAR en data.shom.fr"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "stations",
+      "type": "string",
+      "label": {
+        "en": "Tide gauges",
+        "fr": "Marégraphes",
+        "de": "Pegel",
+        "es": "Mareógrafos"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "SHOM numbers or tide gauge names, separated by commas.",
+        "fr": "Numéros SHOM ou noms de marégraphes, séparés par des virgules.",
+        "de": "SHOM-Nummern oder Pegelnamen, durch Kommas getrennt.",
+        "es": "Números SHOM o nombres de mareógrafos, separados por comas."
+      },
+      "placeholder": {
+        "en": "e.g. 3, Le Havre, Pointe-à-Pitre",
+        "fr": "ex. 3, Le Havre, Pointe-à-Pitre",
+        "de": "z. B. 3, Le Havre, Pointe-à-Pitre",
+        "es": "p. ej. 3, Le Havre, Pointe-à-Pitre"
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": ""
+    },
+    {
+      "key": "around_home",
+      "type": "select",
+      "label": {
+        "en": "Around my house",
+        "fr": "Autour de ma maison",
+        "de": "Rund um mein Haus",
+        "es": "Alrededor de mi casa"
+      },
+      "description": {
+        "en": "Also follow the nearest tide gauge that sends readings, within this distance of the location of your house in Gladys.",
+        "fr": "Suivre aussi le marégraphe le plus proche qui envoie des mesures, à cette distance au plus de la position de votre maison dans Gladys.",
+        "de": "Verfolge auch den nächsten Pegel, der Messwerte sendet, höchstens so weit vom Standort deines Hauses in Gladys entfernt.",
+        "es": "Seguir también el mareógrafo más cercano que envía mediciones, como máximo a esta distancia de la ubicación de su casa en Gladys."
+      },
+      "required": false,
+      "default": "0",
+      "options": [
+        {
+          "value": "0",
+          "label": {
+            "en": "No",
+            "fr": "Non",
+            "de": "Nein",
+            "es": "No"
+          }
+        },
+        {
+          "value": "25",
+          "label": {
+            "en": "Within 25 km",
+            "fr": "À 25 km",
+            "de": "Im Umkreis von 25 km",
+            "es": "A 25 km"
+          }
+        },
+        {
+          "value": "50",
+          "label": {
+            "en": "Within 50 km",
+            "fr": "À 50 km",
+            "de": "Im Umkreis von 50 km",
+            "es": "A 50 km"
+          }
+        },
+        {
+          "value": "100",
+          "label": {
+            "en": "Within 100 km",
+            "fr": "À 100 km",
+            "de": "Im Umkreis von 100 km",
+            "es": "A 100 km"
+          }
+        }
+      ]
+    },
+    {
+      "key": "refresh_interval",
+      "type": "select",
+      "label": {
+        "en": "Refresh interval",
+        "fr": "Fréquence de mise à jour",
+        "de": "Aktualisierungsintervall",
+        "es": "Intervalo de actualización"
+      },
+      "description": {
+        "en": "Gauges measure every minute, the surge forecast changes every 10 minutes. One request per tide gauge.",
+        "fr": "Les marégraphes mesurent chaque minute, la surcote prévue change toutes les 10 minutes. Une requête par marégraphe.",
+        "de": "Die Pegel messen jede Minute, die Windstau-Vorhersage ändert sich alle 10 Minuten. Eine Anfrage pro Pegel.",
+        "es": "Los mareógrafos miden cada minuto, la sobreelevación prevista cambia cada 10 minutos. Una solicitud por mareógrafo."
+      },
+      "required": false,
+      "default": "10",
+      "options": [
+        {
+          "value": "5",
+          "label": {
+            "en": "5 minutes",
+            "fr": "5 minutes",
+            "de": "5 Minuten",
+            "es": "5 minutos"
+          }
+        },
+        {
+          "value": "10",
+          "label": {
+            "en": "10 minutes",
+            "fr": "10 minutes",
+            "de": "10 Minuten",
+            "es": "10 minutos"
+          }
+        },
+        {
+          "value": "15",
+          "label": {
+            "en": "15 minutes",
+            "fr": "15 minutes",
+            "de": "15 Minuten",
+            "es": "15 minutos"
+          }
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the feature names",
+        "fr": "Langue des noms de fonctionnalités",
+        "de": "Sprache der Funktionsnamen",
+        "es": "Idioma de los nombres de las funciones"
+      },
+      "description": {
+        "en": "Names given to the features of new devices (Measured sea level, Surge forecast…), and language of their texts, of the scene variables and of the summary.",
+        "fr": "Noms donnés aux fonctionnalités des nouveaux appareils (Hauteur d'eau mesurée, Surcote prévue…), et langue de leurs textes, des variables de scène et du résumé.",
+        "de": "Namen der Funktionen neuer Geräte (Gemessener Wasserstand, Windstau-Vorhersage…) und Sprache ihrer Texte, der Szenenvariablen und der Zusammenfassung.",
+        "es": "Nombres de las funciones de los nuevos dispositivos (Nivel del mar medido, Sobreelevación prevista…) e idioma de sus textos, de las variables de escena y del resumen."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
+      "key": "search_stations",
+      "label": {
+        "en": "Find tide gauges",
+        "fr": "Chercher des marégraphes",
+        "de": "Pegel suchen",
+        "es": "Buscar mareógrafos"
+      },
+      "description": {
+        "en": "Lists tide gauges with their SHOM number, distance and current sea level: around your house, by name or by number.",
+        "fr": "Liste les marégraphes avec leur numéro SHOM, leur distance et leur hauteur d'eau actuelle : autour de votre maison, par nom ou par numéro.",
+        "de": "Listet Pegel mit SHOM-Nummer, Entfernung und aktuellem Wasserstand auf: rund um dein Haus, nach Name oder nach Nummer.",
+        "es": "Enumera los mareógrafos con su número SHOM, su distancia y su nivel actual: alrededor de su casa, por nombre o por número."
+      },
+      "timeout_seconds": 60,
       "fields": [
         {
-          "key": "device",
+          "key": "query",
+          "type": "string",
+          "label": {
+            "en": "What",
+            "fr": "Quoi",
+            "de": "Was",
+            "es": "Qué"
+          },
+          "description": {
+            "en": "Empty: around your house. Or a tide gauge name (Brest, Saint-Malo) or its SHOM number.",
+            "fr": "Vide : autour de votre maison. Ou un nom de marégraphe (Brest, Saint-Malo) ou son numéro SHOM.",
+            "de": "Leer: rund um dein Haus. Oder ein Pegelname (Brest, Saint-Malo) oder seine SHOM-Nummer.",
+            "es": "Vacío: alrededor de su casa. O un nombre de mareógrafo (Brest, Saint-Malo) o su número SHOM."
+          },
+          "placeholder": {
+            "en": "e.g. Brest",
+            "fr": "ex. Brest",
+            "de": "z. B. Brest",
+            "es": "p. ej. Brest"
+          },
+          "required": false
+        },
+        {
+          "key": "radius",
           "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
+          "label": {
+            "en": "Distance around the house",
+            "fr": "Distance autour de la maison",
+            "de": "Entfernung um das Haus",
+            "es": "Distancia alrededor de la casa"
+          },
+          "description": {
+            "en": "50 km when empty.",
+            "fr": "50 km si vide.",
+            "de": "50 km, wenn leer.",
+            "es": "50 km si está vacío."
+          },
+          "required": false,
+          "options": [
+            {
+              "value": "25",
+              "label": {
+                "en": "25 km",
+                "fr": "25 km",
+                "de": "25 km",
+                "es": "25 km"
+              }
+            },
+            {
+              "value": "50",
+              "label": {
+                "en": "50 km",
+                "fr": "50 km",
+                "de": "50 km",
+                "es": "50 km"
+              }
+            },
+            {
+              "value": "100",
+              "label": {
+                "en": "100 km",
+                "fr": "100 km",
+                "de": "100 km",
+                "es": "100 km"
+              }
+            },
+            {
+              "value": "200",
+              "label": {
+                "en": "200 km",
+                "fr": "200 km",
+                "de": "200 km",
+                "es": "200 km"
+              }
+            }
+          ]
         }
       ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "surge_above",
+      "label": {
+        "en": "Surge forecast above a threshold",
+        "fr": "Surcote prévue au-dessus d'un seuil",
+        "de": "Windstau-Vorhersage über einer Schwelle",
+        "es": "Sobreelevación prevista por encima de un umbral"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "The surge the SHOM forecasts now at a followed tide gauge rises to the chosen threshold or above.",
+        "fr": "La surcote que le SHOM prévoit maintenant à un marégraphe suivi atteint ou dépasse le seuil choisi.",
+        "de": "Der Windstau, den der SHOM jetzt an einem verfolgten Pegel vorhersagt, erreicht oder überschreitet die gewählte Schwelle.",
+        "es": "La sobreelevación que el SHOM prevé ahora en un mareógrafo seguido alcanza o supera el umbral elegido."
       },
       "fields": [
         {
-          "key": "device",
+          "key": "station",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
+          "label": {
+            "en": "Tide gauge",
+            "fr": "Marégraphe",
+            "de": "Pegel",
+            "es": "Mareógrafo"
+          }
         },
         {
-          "key": "target",
+          "key": "threshold",
           "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
+          "label": {
+            "en": "Threshold",
+            "fr": "Seuil",
+            "de": "Schwelle",
+            "es": "Umbral"
+          },
           "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+            {
+              "value": "20",
+              "label": {
+                "en": "20 cm",
+                "fr": "20 cm",
+                "de": "20 cm",
+                "es": "20 cm"
+              }
+            },
+            {
+              "value": "30",
+              "label": {
+                "en": "30 cm",
+                "fr": "30 cm",
+                "de": "30 cm",
+                "es": "30 cm"
+              }
+            },
+            {
+              "value": "50",
+              "label": {
+                "en": "50 cm",
+                "fr": "50 cm",
+                "de": "50 cm",
+                "es": "50 cm"
+              }
+            },
+            {
+              "value": "80",
+              "label": {
+                "en": "80 cm",
+                "fr": "80 cm",
+                "de": "80 cm",
+                "es": "80 cm"
+              }
+            },
+            {
+              "value": "100",
+              "label": {
+                "en": "100 cm",
+                "fr": "100 cm",
+                "de": "100 cm",
+                "es": "100 cm"
+              }
+            }
           ]
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "station_name",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Tide gauge name",
+            "fr": "Nom du marégraphe",
+            "de": "Name des Pegels",
+            "es": "Nombre del mareógrafo"
+          }
+        },
+        {
+          "key": "surge",
+          "type": "number",
+          "label": {
+            "en": "Surge forecast now (cm)",
+            "fr": "Surcote prévue maintenant (cm)",
+            "de": "Windstau-Vorhersage jetzt (cm)",
+            "es": "Sobreelevación prevista ahora (cm)"
+          }
+        },
+        {
+          "key": "height",
+          "type": "number",
+          "label": {
+            "en": "Measured sea level (m)",
+            "fr": "Hauteur d'eau mesurée (m)",
+            "de": "Gemessener Wasserstand (m)",
+            "es": "Nivel del mar medido (m)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "surge_back_to_normal",
+      "label": {
+        "en": "Surge back below a threshold",
+        "fr": "Surcote repassée sous un seuil",
+        "de": "Windstau wieder unter einer Schwelle",
+        "es": "Sobreelevación de nuevo bajo un umbral"
+      },
+      "description": {
+        "en": "The surge the SHOM forecasts now at a followed tide gauge falls back below the chosen threshold (5 cm margin).",
+        "fr": "La surcote que le SHOM prévoit maintenant à un marégraphe suivi repasse sous le seuil choisi (marge de 5 cm).",
+        "de": "Der Windstau, den der SHOM jetzt an einem verfolgten Pegel vorhersagt, fällt wieder unter die gewählte Schwelle (5 cm Spielraum).",
+        "es": "La sobreelevación que el SHOM prevé ahora en un mareógrafo seguido vuelve a bajar del umbral elegido (margen de 5 cm)."
+      },
+      "fields": [
+        {
+          "key": "station",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Tide gauge",
+            "fr": "Marégraphe",
+            "de": "Pegel",
+            "es": "Mareógrafo"
+          }
+        },
+        {
+          "key": "threshold",
+          "type": "multi_select",
+          "label": {
+            "en": "Threshold",
+            "fr": "Seuil",
+            "de": "Schwelle",
+            "es": "Umbral"
+          },
+          "options": [
+            {
+              "value": "20",
+              "label": {
+                "en": "20 cm",
+                "fr": "20 cm",
+                "de": "20 cm",
+                "es": "20 cm"
+              }
+            },
+            {
+              "value": "30",
+              "label": {
+                "en": "30 cm",
+                "fr": "30 cm",
+                "de": "30 cm",
+                "es": "30 cm"
+              }
+            },
+            {
+              "value": "50",
+              "label": {
+                "en": "50 cm",
+                "fr": "50 cm",
+                "de": "50 cm",
+                "es": "50 cm"
+              }
+            },
+            {
+              "value": "80",
+              "label": {
+                "en": "80 cm",
+                "fr": "80 cm",
+                "de": "80 cm",
+                "es": "80 cm"
+              }
+            },
+            {
+              "value": "100",
+              "label": {
+                "en": "100 cm",
+                "fr": "100 cm",
+                "de": "100 cm",
+                "es": "100 cm"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "station_name",
+          "type": "string",
+          "label": {
+            "en": "Tide gauge name",
+            "fr": "Nom du marégraphe",
+            "de": "Name des Pegels",
+            "es": "Nombre del mareógrafo"
+          }
+        },
+        {
+          "key": "surge",
+          "type": "number",
+          "label": {
+            "en": "Surge forecast now (cm)",
+            "fr": "Surcote prévue maintenant (cm)",
+            "de": "Windstau-Vorhersage jetzt (cm)",
+            "es": "Sobreelevación prevista ahora (cm)"
+          }
+        },
+        {
+          "key": "height",
+          "type": "number",
+          "label": {
+            "en": "Measured sea level (m)",
+            "fr": "Hauteur d'eau mesurée (m)",
+            "de": "Gemessener Wasserstand (m)",
+            "es": "Nivel del mar medido (m)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "surge_forecast_above",
+      "label": {
+        "en": "Surge above a threshold within 24 h",
+        "fr": "Surcote au-dessus d'un seuil dans les 24 h",
+        "de": "Windstau über einer Schwelle in 24 h",
+        "es": "Sobreelevación por encima de un umbral en 24 h"
+      },
+      "description": {
+        "en": "The highest surge the SHOM forecasts for the next 24 hours at a followed tide gauge reaches the chosen threshold: a warning ahead of time.",
+        "fr": "La surcote maximale que le SHOM prévoit pour les 24 prochaines heures à un marégraphe suivi atteint le seuil choisi : une alerte à l'avance.",
+        "de": "Der höchste Windstau, den der SHOM für die nächsten 24 Stunden an einem verfolgten Pegel vorhersagt, erreicht die gewählte Schwelle: eine Vorwarnung.",
+        "es": "La sobreelevación máxima que el SHOM prevé para las próximas 24 horas en un mareógrafo seguido alcanza el umbral elegido: un aviso anticipado."
+      },
+      "fields": [
+        {
+          "key": "station",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Tide gauge",
+            "fr": "Marégraphe",
+            "de": "Pegel",
+            "es": "Mareógrafo"
+          }
+        },
+        {
+          "key": "threshold",
+          "type": "multi_select",
+          "label": {
+            "en": "Threshold",
+            "fr": "Seuil",
+            "de": "Schwelle",
+            "es": "Umbral"
+          },
+          "options": [
+            {
+              "value": "20",
+              "label": {
+                "en": "20 cm",
+                "fr": "20 cm",
+                "de": "20 cm",
+                "es": "20 cm"
+              }
+            },
+            {
+              "value": "30",
+              "label": {
+                "en": "30 cm",
+                "fr": "30 cm",
+                "de": "30 cm",
+                "es": "30 cm"
+              }
+            },
+            {
+              "value": "50",
+              "label": {
+                "en": "50 cm",
+                "fr": "50 cm",
+                "de": "50 cm",
+                "es": "50 cm"
+              }
+            },
+            {
+              "value": "80",
+              "label": {
+                "en": "80 cm",
+                "fr": "80 cm",
+                "de": "80 cm",
+                "es": "80 cm"
+              }
+            },
+            {
+              "value": "100",
+              "label": {
+                "en": "100 cm",
+                "fr": "100 cm",
+                "de": "100 cm",
+                "es": "100 cm"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "station_name",
+          "type": "string",
+          "label": {
+            "en": "Tide gauge name",
+            "fr": "Nom du marégraphe",
+            "de": "Name des Pegels",
+            "es": "Nombre del mareógrafo"
+          }
+        },
+        {
+          "key": "surge_peak",
+          "type": "number",
+          "label": {
+            "en": "Highest surge forecast (cm)",
+            "fr": "Surcote maximale prévue (cm)",
+            "de": "Höchster vorhergesagter Windstau (cm)",
+            "es": "Sobreelevación máxima prevista (cm)"
+          }
+        },
+        {
+          "key": "peak_time",
+          "type": "string",
+          "label": {
+            "en": "Time of the highest surge",
+            "fr": "Heure de la surcote maximale",
+            "de": "Zeitpunkt des höchsten Windstaus",
+            "es": "Hora de la sobreelevación máxima"
+          }
+        }
+      ]
+    },
+    {
+      "key": "height_above",
+      "label": {
+        "en": "Sea level above a threshold",
+        "fr": "Hauteur d'eau au-dessus d'un seuil",
+        "de": "Wasserstand über einer Schwelle",
+        "es": "Nivel del mar por encima de un umbral"
+      },
+      "description": {
+        "en": "The sea level measured at a followed tide gauge rises to the chosen height or above (heights above the chart datum, as the SHOM gives them).",
+        "fr": "La hauteur d'eau mesurée à un marégraphe suivi atteint ou dépasse la hauteur choisie (hauteurs au-dessus du zéro hydrographique, telles que le SHOM les donne).",
+        "de": "Der an einem verfolgten Pegel gemessene Wasserstand erreicht oder überschreitet die gewählte Höhe (Höhen über dem Seekartennull, wie der SHOM sie angibt).",
+        "es": "El nivel del mar medido en un mareógrafo seguido alcanza o supera la altura elegida (alturas sobre el cero hidrográfico, tal como las da el SHOM)."
+      },
+      "fields": [
+        {
+          "key": "station",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Tide gauge",
+            "fr": "Marégraphe",
+            "de": "Pegel",
+            "es": "Mareógrafo"
+          }
+        },
+        {
+          "key": "threshold",
+          "type": "multi_select",
+          "label": {
+            "en": "Height",
+            "fr": "Hauteur",
+            "de": "Höhe",
+            "es": "Altura"
+          },
+          "options": [
+            {
+              "value": "0.5",
+              "label": {
+                "en": "0.5 m",
+                "fr": "0,5 m",
+                "de": "0,5 m",
+                "es": "0,5 m"
+              }
+            },
+            {
+              "value": "1",
+              "label": {
+                "en": "1 m",
+                "fr": "1 m",
+                "de": "1 m",
+                "es": "1 m"
+              }
+            },
+            {
+              "value": "1.5",
+              "label": {
+                "en": "1.5 m",
+                "fr": "1,5 m",
+                "de": "1,5 m",
+                "es": "1,5 m"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "en": "2 m",
+                "fr": "2 m",
+                "de": "2 m",
+                "es": "2 m"
+              }
+            },
+            {
+              "value": "2.5",
+              "label": {
+                "en": "2.5 m",
+                "fr": "2,5 m",
+                "de": "2,5 m",
+                "es": "2,5 m"
+              }
+            },
+            {
+              "value": "3",
+              "label": {
+                "en": "3 m",
+                "fr": "3 m",
+                "de": "3 m",
+                "es": "3 m"
+              }
+            },
+            {
+              "value": "4",
+              "label": {
+                "en": "4 m",
+                "fr": "4 m",
+                "de": "4 m",
+                "es": "4 m"
+              }
+            },
+            {
+              "value": "5",
+              "label": {
+                "en": "5 m",
+                "fr": "5 m",
+                "de": "5 m",
+                "es": "5 m"
+              }
+            },
+            {
+              "value": "6",
+              "label": {
+                "en": "6 m",
+                "fr": "6 m",
+                "de": "6 m",
+                "es": "6 m"
+              }
+            },
+            {
+              "value": "7",
+              "label": {
+                "en": "7 m",
+                "fr": "7 m",
+                "de": "7 m",
+                "es": "7 m"
+              }
+            },
+            {
+              "value": "8",
+              "label": {
+                "en": "8 m",
+                "fr": "8 m",
+                "de": "8 m",
+                "es": "8 m"
+              }
+            },
+            {
+              "value": "9",
+              "label": {
+                "en": "9 m",
+                "fr": "9 m",
+                "de": "9 m",
+                "es": "9 m"
+              }
+            },
+            {
+              "value": "10",
+              "label": {
+                "en": "10 m",
+                "fr": "10 m",
+                "de": "10 m",
+                "es": "10 m"
+              }
+            },
+            {
+              "value": "11",
+              "label": {
+                "en": "11 m",
+                "fr": "11 m",
+                "de": "11 m",
+                "es": "11 m"
+              }
+            },
+            {
+              "value": "12",
+              "label": {
+                "en": "12 m",
+                "fr": "12 m",
+                "de": "12 m",
+                "es": "12 m"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "station_name",
+          "type": "string",
+          "label": {
+            "en": "Tide gauge name",
+            "fr": "Nom du marégraphe",
+            "de": "Name des Pegels",
+            "es": "Nombre del mareógrafo"
+          }
+        },
+        {
+          "key": "height",
+          "type": "number",
+          "label": {
+            "en": "Measured sea level (m)",
+            "fr": "Hauteur d'eau mesurée (m)",
+            "de": "Gemessener Wasserstand (m)",
+            "es": "Nivel del mar medido (m)"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "summary",
+      "label": {
+        "en": "Tide gauge summary",
+        "fr": "Résumé d'un marégraphe",
+        "de": "Pegel-Zusammenfassung",
+        "es": "Resumen de un mareógrafo"
       },
-      "timeout_seconds": 15,
+      "description": {
+        "en": "One sentence on a tide gauge (sea level, trend, surge forecast), to send in a message.",
+        "fr": "Une phrase sur un marégraphe (hauteur d'eau, tendance, surcote prévue), à envoyer dans un message.",
+        "de": "Ein Satz zu einem Pegel (Wasserstand, Tendenz, Windstau-Vorhersage), zum Versenden in einer Nachricht.",
+        "es": "Una frase sobre un mareógrafo (nivel del mar, tendencia, sobreelevación prevista), para enviar en un mensaje."
+      },
+      "timeout_seconds": 10,
       "fields": [
         {
-          "key": "device",
+          "key": "station",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "label": {
+            "en": "Tide gauge",
+            "fr": "Marégraphe",
+            "de": "Pegel",
+            "es": "Mareógrafo"
+          },
           "required": true
         }
       ],
       "outputs": [
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary",
+            "fr": "Résumé",
+            "de": "Zusammenfassung",
+            "es": "Resumen"
+          }
+        },
+        {
+          "key": "height",
+          "type": "number",
+          "label": {
+            "en": "Measured sea level (m)",
+            "fr": "Hauteur d'eau mesurée (m)",
+            "de": "Gemessener Wasserstand (m)",
+            "es": "Nivel del mar medido (m)"
+          }
+        },
+        {
+          "key": "surge",
+          "type": "number",
+          "label": {
+            "en": "Surge forecast now (cm)",
+            "fr": "Surcote prévue maintenant (cm)",
+            "de": "Windstau-Vorhersage jetzt (cm)",
+            "es": "Sobreelevación prevista ahora (cm)"
+          }
+        },
+        {
+          "key": "surge_peak",
+          "type": "number",
+          "label": {
+            "en": "Highest surge in 24 h (cm)",
+            "fr": "Surcote max. sur 24 h (cm)",
+            "de": "Höchster Windstau in 24 h (cm)",
+            "es": "Sobreelevación máx. en 24 h (cm)"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "tide_gauges",
+      "label": {
+        "en": "Tide gauges",
+        "fr": "Marégraphes",
+        "de": "Pegel",
+        "es": "Mareógrafos"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "Followed tide gauges: sea level, trend and surge forecast.",
+        "fr": "Marégraphes suivis : hauteur d'eau, tendance et surcote prévue.",
+        "de": "Verfolgte Pegel: Wasserstand, Tendenz und Windstau-Vorhersage.",
+        "es": "Mareógrafos seguidos: nivel del mar, tendencia y sobreelevación prevista."
+      },
+      "icon": "anchor",
+      "settings": [
+        {
+          "key": "station",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": {
+            "en": "Tide gauge",
+            "fr": "Marégraphe",
+            "de": "Pegel",
+            "es": "Mareógrafo"
+          },
+          "description": {
+            "en": "Leave empty to list every tide gauge (10 at most); pick one for its details.",
+            "fr": "Laissez vide pour lister tous les marégraphes (10 au plus) ; choisissez-en un pour son détail.",
+            "de": "Leer lassen, um alle Pegel aufzulisten (höchstens 10); wähle einen für seine Details.",
+            "es": "Déjelo vacío para listar todos los mareógrafos (10 como máximo); elija uno para ver su detalle."
+          }
+        },
+        {
+          "key": "show_chart",
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "label": {
+            "en": "Show the 24-hour curve",
+            "fr": "Afficher la courbe sur 24 h",
+            "de": "24-Stunden-Kurve anzeigen",
+            "es": "Mostrar la curva de 24 horas"
+          },
+          "description": {
+            "en": "For a chosen tide gauge: the measured sea level over the last 24 hours.",
+            "fr": "Pour un marégraphe choisi : la hauteur d'eau mesurée sur les dernières 24 heures.",
+            "de": "Für einen gewählten Pegel: der gemessene Wasserstand der letzten 24 Stunden.",
+            "es": "Para un mareógrafo elegido: el nivel del mar medido en las últimas 24 horas."
+          }
+        }
+      ]
     }
   ]
 }

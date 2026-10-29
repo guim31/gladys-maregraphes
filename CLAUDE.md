@@ -31,16 +31,20 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only (handlers registered in src/app.js)
+src/app.js                        registers every SDK handler on the monitor, action, scene action, widget
+src/monitor.js                    followed gauges, refresh cycles, states, scene triggers
+src/shom.js                       SHOM maregraphie client and parsing (sources 1 and 9, gauge list)
+src/devices.js                    Gladys device of a tide gauge (features, names, external ids)
+src/search.js                     "Find tide gauges" configuration action
+src/scenes.js                     scene action `summary`
+src/widgets.js                    dashboard widget `tide_gauges`
+src/messages.js                   texts sent from the container, four languages
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
-gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+src/http.js, geo.js, store.js     GET JSON, distances, /data persistence
+gladys-assistant-integration.json manifest: config_schema, action, scene triggers and action, widget
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (same sections)
+test/                             node --test, against the SDK's fake Gladys and recorded answers
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -250,3 +254,33 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## Marégraphes SHOM (propre à cette intégration)
+
+- Service sans clé : `https://services.data.shom.fr/maregraphie/`. Liste :
+  `service/tidegauges` (176 marégraphes le 29/10/2026, `shom_id`, `name` en majuscules avec `_`,
+  `state` OK/ASYNC/OLD/KO/PB/HIDDEN, `reseau` REFMAR/RONIM ; les `HIDDEN` sont écartés). Mesures :
+  `observation/json/<id>?sources=1,9&dtStart=…Z&dtEnd=…Z`, horodatage UTC « 2026/10/29 12:00:00 ».
+  Un identifiant inconnu rend **403** (vérifié le 29/10 ; les identifiants ne viennent que de la
+  liste) ; une source inconnue, 400 ; un marégraphe sans données, une liste vide. Papeete (383)
+  n'a pas de prévision de surcote.
+- Sources vérifiées dans le front de data.shom.fr : 1 brutes haute fréquence (chaque minute, m),
+  2 brutes temps différé, 3 validées temps différé, 4 validées horaires, 5 brutes horaires, 6
+  pleines et basses mers, **7 prédictions de marée et 8 surcotes mesurées : refusées (400) par le
+  service sans clé**, 9 **prévisions de surcote** (toutes les 10 min, ~3 jours d'avance), 10
+  prévision de hauteur totale (route `prevision`, **exige une clé**). La clé incluse dans le site
+  web n'est volontairement pas utilisée : l'intégration publie la surcote **prévue** (source 9) et
+  jamais de surcote mesurée inventée.
+- Un état `KO` dans la liste n'empêche pas l'envoi de mesures (Dunkerque le 29/10) : la fraîcheur
+  se juge sur la dernière mesure (périmée au-delà d'une heure), pas sur `state`.
+- Mesures au dixième de mm et bruitées de quelques mm : publiées au cm, tendance sur la moyenne
+  des 5 dernières minutes contre celle d'il y a 15 à 20 min (seuil 2 cm → étale).
+- Historique gardé dans `/data` : 24 h à un point par 10 min (courbe du widget, 144 points), la
+  dernière demi-heure à la minute, et **toujours la dernière mesure** (elle date le silence).
+- Requête de chaque cycle : depuis la dernière mesure, mais au moins les 15 dernières minutes (pour
+  avoir le point de prévision « maintenant »), jusqu'à +25 h (pic de surcote sur 24 h).
+- Déclencheurs à seuils fixes (filtres de scène par égalité) : clés de seuil en chaînes (`'0.5'`,
+  `'30'`), hystérésis 5 cm, mémoire de 3 h après laquelle un redémarrage ne déclenche rien. Les
+  franchissements de hauteur (deux marées par jour) sont journalisés en debug, ceux de surcote en
+  info.
+- `countries: ["FR"]` donc `gladys_version >=5.3.0`.

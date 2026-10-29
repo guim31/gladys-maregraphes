@@ -1,67 +1,173 @@
-# Template de démonstration
+# Marégraphes (SHOM)
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Amène dans Gladys la **hauteur d'eau mesurée par les marégraphes du SHOM** (Service hydrographique
+et océanographique de la Marine, réseau REFMAR : environ 170 marégraphes sur les côtes de
+métropole, de Corse et d'outre-mer), avec la **surcote prévue** par le SHOM au même endroit. Sans
+compte ni clé.
+
+> **Des valeurs brutes, pas un service d'alerte.** Les hauteurs sont diffusées en temps réel sans
+> validation par le SHOM ; la surcote est une prévision. Les données peuvent être en retard,
+> manquantes ou fausses, et l'intégration dépend de votre Gladys, de votre accès à Internet et d'un
+> service public. En cas de tempête, suivez les alertes officielles (vigilance
+> « vagues-submersion » de Météo-France, votre préfecture, le 112). Intégration non affiliée au
+> SHOM.
+
+Pour les **prédictions de marée** (pleines et basses mers, coefficients), voyez l'intégration
+« Marées France » : celle-ci donne ce que la mer fait **réellement** à un marégraphe.
 
 ## Ce que vous obtenez
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+- **Un appareil par marégraphe** suivi : la **hauteur d'eau mesurée** (en m), la **tendance** de
+  la marée (monte, descend, étale), la **surcote prévue** maintenant et la **surcote maximale
+  prévue sur les 24 prochaines heures** (en cm), et l'heure de la dernière mesure.
+- Un marégraphe qui n'envoie plus rien depuis plus d'une heure est signalé comme tel (« Pas de
+  nouvelle mesure depuis… ») : une vieille valeur n'est jamais renvoyée comme si elle était
+  fraîche, et aucune valeur n'est inventée.
+- Quatre **déclencheurs de scène** : la surcote prévue dépasse un seuil (20, 30, 50, 80 ou
+  100 cm), repasse dessous, la surcote maximale prévue sur 24 h atteint un seuil (une alerte à
+  l'avance), et la hauteur mesurée dépasse une hauteur de votre choix.
+- Une **action de scène**, « Résumé d'un marégraphe » : une phrase à envoyer dans un message
+  (« Brest : hauteur d'eau 5,8 m, monte, mesurée à 17:08. Surcote prévue maintenant : −2 cm. »).
+- Un **widget de tableau de bord** : vos marégraphes avec leur hauteur, leur tendance et leur
+  surcote, ou un marégraphe avec ses valeurs en direct, la courbe des dernières 24 heures et la
+  surcote maximale à venir.
+- Un bouton **« Chercher des marégraphes »** qui liste les marégraphes autour de votre maison, par
+  nom ou par numéro, avec leur hauteur d'eau actuelle.
+
+## Prérequis
+
+- Gladys Assistant **5.3.0** ou plus récent.
+- Un accès à Internet depuis Gladys : l'intégration lit `services.data.shom.fr`.
+- Pour « Autour de ma maison » : la position de votre maison dans Gladys (Paramètres, Maisons).
+  L'intégration la demande à l'installation (la permission « position »). Elle ne sert qu'à
+  l'intérieur du conteneur pour trouver le marégraphe le plus proche : jamais envoyée au SHOM (qui
+  ne voit que les marégraphes demandés), jamais enregistrée ni écrite dans les logs.
 
 ## Configuration
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+### Réglages
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+| Réglage                            | Ce qu'il fait                                                                                                       |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Marégraphes                        | Numéros SHOM ou noms, séparés par des virgules : `3, Le Havre, Pointe-à-Pitre`. Une page data.shom.fr marche aussi. |
+| Autour de ma maison                | Suit aussi le marégraphe le plus proche qui envoie des mesures, à 25, 50 ou 100 km de votre maison.                 |
+| Fréquence de mise à jour           | 5, 10 (par défaut) ou 15 minutes. Une requête par marégraphe.                                                       |
+| Langue des noms de fonctionnalités | Noms des fonctionnalités des nouveaux appareils, et langue de leurs textes, des variables de scène et du résumé.    |
 
-## Actions
+Enregistrez, puis ouvrez l'onglet **Découverte** de l'intégration et créez les appareils voulus.
+Un marégraphe reste suivi tant que son appareil existe, même si vous le retirez de la
+configuration.
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+### Trouver vos marégraphes
 
-## Scènes
+Cliquez sur **« Chercher des marégraphes »** dans la configuration. Laissez le champ vide pour
+lister les marégraphes autour de votre maison (50 km, ou la distance choisie), ou tapez :
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+- un nom : `Brest`, `saint malo`, `Pointe à Pitre` (majuscules, accents, tirets et soulignés sont
+  ignorés) ;
+- une partie de nom : `havre` ;
+- un numéro SHOM : `3`.
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+Chaque ligne donne le numéro, le nom, la distance à votre maison et la hauteur d'eau actuelle, ou
+« pas de mesure récente ». Copiez les numéros dans « Marégraphes », puis enregistrez.
 
-## Tableau de bord
+## Appareils
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+| Fonctionnalité        | Type dans Gladys | Valeur                                                                                                            |
+| --------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Hauteur d'eau mesurée | Profondeur (m)   | La dernière mesure du marégraphe, au centimètre, telle que le SHOM la diffuse.                                    |
+| Tendance de la marée  | Texte            | Monte, Descend ou Étale, d'après les 15 à 20 dernières minutes de mesures.                                        |
+| Surcote prévue (SHOM) | Profondeur (cm)  | La surcote que le SHOM prévoit maintenant : positive au-dessus de la marée prédite, négative en dessous (décote). |
+| Surcote max. sur 24 h | Profondeur (cm)  | La plus forte surcote prévue entre maintenant et dans 24 heures.                                                  |
+| Dernière mesure       | Texte            | Heure de la dernière mesure, ou « Pas de nouvelle mesure depuis… ».                                               |
+
+Les deux fonctionnalités de surcote n'existent que si le SHOM prévoit la surcote du marégraphe (si la prévision apparaît après la création de l'appareil, « Mettez à jour » celui-ci dans l'onglet Découverte). Un marégraphe muet affiche « Inconnue » en tendance.
+La **hauteur d'eau n'est pas une profondeur** : c'est la hauteur de l'eau au-dessus de la
+référence du marégraphe (en général le zéro hydrographique, celui des annuaires de marée) ; elle
+se compare aux hauteurs de l'annuaire du même port, pas à un autre marégraphe. Les paramètres de
+l'appareil donnent le numéro SHOM et le réseau (REFMAR, RONIM).
+
+La hauteur et les surcotes sont des fonctionnalités numériques : les scènes de Gladys savent déjà
+les comparer à n'importe quelle valeur de votre choix.
+
+## Widget de tableau de bord
+
+Ajoutez le widget **Marégraphes** à un tableau de bord.
+
+- **Sans réglage** : une ligne par marégraphe suivi (10 au plus) avec sa hauteur, sa tendance et
+  sa surcote prévue, colorée selon la surcote : vert sous 20 cm, orange dès 20 cm, rouge dès
+  50 cm, gris sans mesure récente. Un titre nomme les marégraphes où 20 cm ou plus sont prévus
+  dans les 24 heures.
+- **Avec un marégraphe choisi** : sa hauteur et sa surcote en direct, la courbe de la hauteur
+  mesurée sur les dernières 24 heures (un réglage la masque), la tendance, la surcote maximale
+  prévue et son heure, la dernière mesure et un lien vers sa page data.shom.fr.
+
+## Déclencheurs de scène
+
+| Déclencheur                                | Filtres                          | Variables                                                    |
+| ------------------------------------------ | -------------------------------- | ------------------------------------------------------------ |
+| Surcote prévue au-dessus d'un seuil        | Marégraphe, seuil (20 à 100 cm)  | Nom du marégraphe, seuil, surcote actuelle (cm), hauteur (m) |
+| Surcote repassée sous un seuil             | Marégraphe, seuil                | Nom du marégraphe, seuil, surcote actuelle (cm), hauteur (m) |
+| Surcote au-dessus d'un seuil dans les 24 h | Marégraphe, seuil                | Nom du marégraphe, seuil, surcote maximale (cm), son heure   |
+| Hauteur d'eau au-dessus d'un seuil         | Marégraphe, hauteur (0,5 à 12 m) | Nom du marégraphe, seuil, hauteur (m)                        |
+
+Une valeur doit redescendre de 5 cm sous un seuil avant qu'un nouveau franchissement compte : une
+surcote ou une hauteur qui oscille autour d'un seuil ne déclenche qu'une fois. Les déclencheurs ne partent que pour un appareil créé (ceux de surcote suivent la prévision du SHOM, même si le marégraphe ne mesure plus), et pas après un redémarrage de plus de 3 heures.
+
+## Action de scène
+
+**Résumé d'un marégraphe** (champ : le marégraphe) donne une phrase dans la langue de la
+configuration, pour un message ou une annonce vocale, et les valeurs pour les actions suivantes :
+le résumé, la hauteur (m), la surcote prévue maintenant et la surcote maximale sur 24 h (cm).
+
+## Exemples de scènes
+
+- **Alerte tempête** : « Surcote au-dessus d'un seuil dans les 24 h », votre marégraphe, 50 cm →
+  envoyer un message : « {{station_name}} : surcote de {{surge_peak}} cm attendue le
+  {{peak_time}} ».
+- **Quai inondé** : « Hauteur d'eau au-dessus d'un seuil », Saint-Malo, 12 m → prévenir la
+  famille et fermer la porte du garage.
+- **Point du matin** : chaque jour à 7 h, « Résumé d'un marégraphe » de votre port → envoyer le
+  résumé.
+- **Fin d'épisode** : « Surcote repassée sous un seuil », 30 cm → « La surcote est passée ».
+
+## Sources des données, licence et quotas
+
+- Données : **SHOM**, réseau REFMAR (Réseaux de référence des observations marégraphiques), et les
+  organismes qui exploitent les marégraphes (ports, collectivités, Météo-France…). Mention :
+  « SHOM / REFMAR », DOI [10.17183/REFMAR](https://dx.doi.org/10.17183/REFMAR). Les données de
+  data.shom.fr sont publiées sous Licence Ouverte (Etalab) 2.0 ; le widget cite la source.
+- Les hauteurs sont des **données brutes en temps réel** (« source 1 » du SHOM, chaque minute),
+  diffusées sans validation : elles peuvent contenir des valeurs fausses, corrigées plus tard dans
+  les séries validées, que l'intégration n'utilise pas.
+- La surcote est la **prévision** du SHOM (« source 9 », toutes les 10 minutes, quelques jours à
+  l'avance). La surcote mesurée (hauteur moins prédiction de marée) exige la prédiction, que ce
+  service sans clé ne fournit pas : l'intégration ne la calcule pas.
+- Ni compte, ni clé, ni quota documenté. L'intégration reste légère : **une requête par
+  marégraphe et par mise à jour** (10 minutes par défaut), pour les mesures depuis la précédente
+  et la prévision des 25 prochaines heures ; la liste des marégraphes (environ 30 Ko) une fois par
+  semaine.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« Marégraphe inconnu »** : vérifiez l'orthographe ou utilisez « Chercher des marégraphes »,
+  puis copiez le numéro.
+- **« Le service du SHOM ne répond pas »** : le service ou votre accès à Internet est coupé ; les
+  valeurs reviennent d'elles-mêmes.
+- **« Autour de ma maison » n'ajoute rien** : donnez une position à votre maison (Paramètres,
+  Maisons), ou choisissez une distance plus grande. Seul un marégraphe qui a envoyé une mesure dans
+  l'heure est choisi.
+- **Pas de fonctionnalité de surcote** : le SHOM ne prévoit pas la surcote de ce marégraphe.
+- **« Pas de nouvelle mesure depuis… »** : le marégraphe est en panne ou en retard (la liste du
+  SHOM en marque beaucoup « en retard » ou « hors service ») ; les valeurs reviennent d'elles-mêmes.
+- Logs : dans Gladys, les logs de l'intégration ; `LOG_LEVEL=debug` pour voir chaque cycle.
+
+## Limites
+
+- Testée contre le service réel et sur des réponses enregistrées, mais pas encore dans une vraie
+  installation de Gladys : vos retours sont les bienvenus.
+- Ni prédiction de marée, ni surcote mesurée : l'intégration publie la hauteur mesurée et la
+  surcote prévue par le SHOM.
+- 10 marégraphes au plus depuis la configuration (plus ceux dont vous avez créé l'appareil).
+- Les noms des fonctionnalités sont figés à la création de l'appareil : changer la langue ensuite
+  ne change que les textes envoyés après.

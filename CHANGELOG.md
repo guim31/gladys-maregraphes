@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-29
+
 ### Added
 
 - First version: the sea level measured by the SHOM tide gauges (REFMAR network, mainland France,
@@ -22,4 +24,5 @@ the notes of the version's GitHub Release.
 - Dashboard widget: the followed gauges, or one gauge with its 24-hour curve.
 - English, French, German and Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-maregraphes/commits/main
+[Unreleased]: https://github.com/guim31/gladys-maregraphes/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-maregraphes/releases/tag/v1.0.0

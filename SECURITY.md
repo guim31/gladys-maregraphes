@@ -30,6 +30,11 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+The integration holds no secret: the SHOM service needs no account nor key. `/data` keeps the
+followed tide gauges, their recent readings and forecasts, and the side of each scene threshold;
+never the location of the house, which is only used in memory to choose the nearest gauge. The
+container only talks to Gladys and to `services.data.shom.fr` over HTTPS.
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+and the SHOM services the integration reads.
